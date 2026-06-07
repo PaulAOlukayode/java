@@ -1,9 +1,4 @@
-Here is the entire flow in code from start to finish:
 
----
-
-**1. `ApiKeyEngine.java`**
-```java
 package com.aaas.auth;
 
 import java.nio.charset.StandardCharsets;
@@ -91,12 +86,8 @@ public final class ApiKeyEngine {
 
     private ApiKeyEngine() {}
 }
-```
 
----
 
-**2. `MerchantApiKey.java`**
-```java
 package com.aaas.model;
 
 public class MerchantApiKey {
@@ -132,10 +123,7 @@ public class MerchantApiKey {
 }
 ```
 
----
 
-**3. `ProvisionedKeyResponse.java`**
-```java
 package com.aaas.model;
 
 public class ProvisionedKeyResponse {
@@ -154,12 +142,10 @@ public class ProvisionedKeyResponse {
     public String getRawPublicKey() { return rawPublicKey; }
     public String getKeyPrefix()    { return keyPrefix; }
 }
-```
 
----
 
-**4. `ApiKeyProvisioningService.java`**
-```java
+
+
 package com.aaas.auth;
 
 import com.aaas.db.MerchantApiKeyRepository;
@@ -204,12 +190,9 @@ public class ApiKeyProvisioningService {
         );
     }
 }
-```
 
----
 
-**5. `MerchantApiKeyRepository.java`**
-```java
+
 package com.aaas.db;
 
 import com.aaas.model.MerchantApiKey;
@@ -236,12 +219,8 @@ public interface MerchantApiKeyRepository extends JpaRepository<MerchantApiKey, 
     @Query("UPDATE MerchantApiKey k SET k.status = 'revoked' WHERE k.hashedSecretKey = :hash")
     void revokeByHash(@Param("hash") String hash);
 }
-```
 
----
 
-**6. `ApiKeyAuthFilter.java`**
-```java
 package com.aaas.auth;
 
 import jakarta.servlet.*;
@@ -319,12 +298,8 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         );
     }
 }
-```
 
----
 
-**7. `TransactionRequest.java`**
-```java
 package com.aaas.model;
 
 import jakarta.validation.constraints.*;
@@ -344,12 +319,9 @@ public class TransactionRequest {
     public void   setEmail(String email)   { this.email = email; }
     public void   setAmount(Long amount)   { this.amount = amount; }
 }
-```
 
----
 
-**8. `TransactionController.java`**
-```java
+
 package com.aaas.controller;
 
 import com.aaas.model.TransactionRequest;
@@ -384,12 +356,9 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 }
-```
 
----
 
-**9. `ApiKeyRevocationService.java`**
-```java
+
 package com.aaas.auth;
 
 import com.aaas.cache.ApiKeyCacheService;
@@ -427,15 +396,6 @@ public class ApiKeyRevocationService {
 }
 
 
-
-
-
-Here is everything:
-
----
-
-**1. `TransactionRequest.java`**
-```java
 package com.aaas.model;
 
 import jakarta.validation.constraints.*;
@@ -455,12 +415,8 @@ public class TransactionRequest {
     public void setEmail(String email)   { this.email = email; }
     public void setAmount(Long amount)   { this.amount = amount; }
 }
-```
 
----
 
-**2. `TransactionResponse.java`**
-```java
 package com.aaas.model;
 
 public class TransactionResponse {
@@ -495,12 +451,9 @@ public class TransactionResponse {
     public String getMessage() { return message; }
     public Data   getData()    { return data; }
 }
-```
 
----
 
-**3. `Transaction.java`**
-```java
+
 package com.aaas.model;
 
 import java.time.LocalDateTime;
@@ -542,12 +495,8 @@ public class Transaction {
     public void setCreatedAt(LocalDateTime createdAt)  { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt)  { this.updatedAt = updatedAt; }
 }
-```
 
----
 
-**4. `TransactionRepository.java`**
-```java
 package com.aaas.db;
 
 import com.aaas.model.Transaction;
@@ -562,12 +511,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.reference = :reference")
     Optional<Transaction> findByReference(@Param("reference") String reference);
 }
-```
 
----
 
-**5. `TransactionService.java`**
-```java
+
 package com.aaas.service;
 
 import com.aaas.db.TransactionRepository;
@@ -624,12 +570,9 @@ public class TransactionService {
         );
     }
 }
-```
 
----
 
-**6. `TransactionController.java`**
-```java
+
 package com.aaas.controller;
 
 import com.aaas.model.TransactionRequest;
@@ -675,12 +618,8 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 }
-```
 
----
 
-**7. `ApiKeyCacheService.java`**
-```java
 package com.aaas.cache;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -720,12 +659,8 @@ public class ApiKeyCacheService {
         redisTemplate.delete(CACHE_PREFIX + hash);
     }
 }
-```
 
----
 
-**8. `NotificationService.java`**
-```java
 package com.aaas.notify;
 
 import org.springframework.mail.SimpleMailMessage;
@@ -760,12 +695,9 @@ public class NotificationService {
         mailSender.send(mail);
     }
 }
-```
 
----
 
-**9. `RateLimitFilter.java`**
-```java
+
 package com.aaas.auth;
 
 import jakarta.servlet.*;
@@ -831,28 +763,4 @@ public class RateLimitFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-```
 
----
-
-**Complete file list:**
-
-| # | File | Package |
-|---|---|---|
-| 1 | `ApiKeyEngine.java` | `com.aaas.auth` |
-| 2 | `MerchantApiKey.java` | `com.aaas.model` |
-| 3 | `ProvisionedKeyResponse.java` | `com.aaas.model` |
-| 4 | `ApiKeyProvisioningService.java` | `com.aaas.auth` |
-| 5 | `MerchantApiKeyRepository.java` | `com.aaas.db` |
-| 6 | `ApiKeyAuthFilter.java` | `com.aaas.auth` |
-| 7 | `ApiKeyRevocationService.java` | `com.aaas.auth` |
-| 8 | `ApiKeyController.java` | `com.aaas.controller` |
-| 9 | `TransactionRequest.java` | `com.aaas.model` |
-| 10 | `TransactionResponse.java` | `com.aaas.model` |
-| 11 | `Transaction.java` | `com.aaas.model` |
-| 12 | `TransactionRepository.java` | `com.aaas.db` |
-| 13 | `TransactionService.java` | `com.aaas.service` |
-| 14 | `TransactionController.java` | `com.aaas.controller` |
-| 15 | `ApiKeyCacheService.java` | `com.aaas.cache` |
-| 16 | `NotificationService.java` | `com.aaas.notify` |
-| 17 | `RateLimitFilter.java` | `com.aaas.auth` |
